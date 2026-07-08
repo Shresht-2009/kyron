@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateSite } from '@/lib/codegen';
+import { generateFullStackProject } from '@/lib/codegen/fullstack';
 import type { DesignBrief } from '@/types';
 
 export async function POST(req: NextRequest) {
@@ -14,11 +14,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const site = await generateSite(brief);
+    const files = generateFullStackProject(brief);
+    const filesRecord: Record<string, string> = {};
+    let mainHtml = '';
+
+    for (const f of files) {
+      filesRecord[f.path] = f.content;
+      if (f.path.endsWith('/index.html') || f.path === 'index.html') {
+        if (!mainHtml) mainHtml = f.content;
+      }
+    }
+
+    if (!mainHtml) mainHtml = files[0]?.content || '';
 
     return NextResponse.json({
-      html: site.html,
-      files: site.files,
+      html: mainHtml,
+      files: filesRecord,
+      structure: files.map(f => f.path).join('\n'),
       success: true,
     });
   } catch (error: any) {

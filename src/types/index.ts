@@ -5,17 +5,6 @@ export type KyronStyle =
   | 'glass-aurora'
   | 'neo-brutalism';
 
-export interface StyleDefinition {
-  id: KyronStyle;
-  name: string;
-  description: string;
-  vibe: string;
-  colors: ColorPalette;
-  typography: TypographyScale;
-  threeD: ThreeDConfig;
-  motion: MotionConfig;
-}
-
 export interface ColorPalette {
   primary: string;
   secondary: string;
@@ -61,7 +50,7 @@ export interface DesignBrief {
   industry: string;
   targetAudience: string;
   style: KyronStyle;
-  secondaryStyle: KyronStyle | null;
+  secondaryStyles: KyronStyle[];
   blendRatio: number;
   colors: ColorPalette;
   typography: TypographyScale;
@@ -81,17 +70,19 @@ export interface ClarificationMessage {
   options?: string[];
 }
 
-export interface GenerationProgress {
-  phase: string;
-  progress: number;
-  message: string;
+export interface ReasoningChunk {
+  type: 'thought' | 'action' | 'progress' | 'complete';
+  content: string;
 }
 
-export interface GeneratedSite {
-  html: string;
-  css: string;
-  js: string;
-  files: Record<string, string>;
+export interface ProjectFile {
+  path: string;
+  content: string;
+}
+
+export interface GeneratedProject {
+  files: ProjectFile[];
+  structure: string;
 }
 
 export interface DeployResult {

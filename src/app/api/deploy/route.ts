@@ -4,21 +4,21 @@ import { deployToGitHub } from '@/lib/deploy';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { siteName, files, githubToken } = body as {
+    const { siteName, files, repoUrl, githubToken } = body as {
       siteName: string;
       files: Record<string, string>;
+      repoUrl?: string;
       githubToken?: string;
     };
 
     if (!siteName || !files || !files['index.html']) {
       return NextResponse.json(
-        { error: 'siteName and files with index.html are required' },
+        { error: 'siteName and files (with index.html) are required' },
         { status: 400 }
       );
     }
 
-    const result = await deployToGitHub(siteName, files, githubToken);
-
+    const result = await deployToGitHub(siteName, files, repoUrl, githubToken);
     return NextResponse.json(result);
   } catch (error: any) {
     console.error('Deploy API error:', error);
