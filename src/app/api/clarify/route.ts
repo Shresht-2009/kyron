@@ -4,9 +4,10 @@ import { clarifyPrompt, generateDesignBrief } from '@/lib/design-brief';
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { messages, action } = body as {
+    const { messages, action, questionCount } = body as {
       messages: { role: string; content: string }[];
       action: 'ask' | 'generate';
+      questionCount?: number;
     };
 
     if (!messages || !Array.isArray(messages)) {
@@ -18,12 +19,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ brief, ready: true });
     }
 
-    const response = await clarifyPrompt(messages);
+    const response = await clarifyPrompt(messages, questionCount ?? 0);
     const isReady = response.trim() === 'DESIGN_BRIEF_READY';
 
     if (isReady) {
       const brief = await generateDesignBrief(messages);
-      return NextResponse.json({ brief, ready: true, message: 'I have enough information to design your site!' });
+      return NextResponse.json({ brief, ready: true, message: 'I have everything I need. Generating your site now...' });
     }
 
     return NextResponse.json({

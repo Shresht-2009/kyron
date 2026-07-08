@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
-import ThemeToggle from '@/components/ThemeToggle';
 import StyleCard from '@/components/StyleCard';
 import Chat from '@/components/Chat';
 import PreviewFrame from '@/components/PreviewFrame';
@@ -91,8 +90,8 @@ export default function CreatePage() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-[#0b0b0f]">
-      <header className="flex items-center justify-between px-4 h-14 border-b border-zinc-800 bg-[#0b0b0f]/80 backdrop-blur-xl flex-shrink-0">
+    <div className="h-screen flex flex-col bg-[#09090b]">
+      <header className="flex items-center justify-between px-4 h-14 border-b border-zinc-800 bg-[#09090b]/80 backdrop-blur-xl flex-shrink-0">
         <Link href="/" className="flex items-center gap-2">
           <div className="w-7 h-7 rounded-md bg-[#ff4d00] flex items-center justify-center text-black font-bold text-xs">
             K
