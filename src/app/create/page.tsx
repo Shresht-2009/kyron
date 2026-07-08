@@ -91,22 +91,21 @@ export default function CreatePage() {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-zinc-50 dark:bg-zinc-950">
-      <header className="flex items-center justify-between px-4 h-14 border-b border-zinc-200 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl flex-shrink-0">
+    <div className="h-screen flex flex-col bg-[#0b0b0f]">
+      <header className="flex items-center justify-between px-4 h-14 border-b border-zinc-800 bg-[#0b0b0f]/80 backdrop-blur-xl flex-shrink-0">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-md bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white font-bold text-xs">
+          <div className="w-7 h-7 rounded-md bg-[#ff4d00] flex items-center justify-center text-black font-bold text-xs">
             K
           </div>
-          <span className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">Kyron</span>
+          <span className="font-semibold text-sm text-zinc-100">Kyron</span>
         </Link>
 
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-xs text-zinc-400">
-            <span className={`w-1.5 h-1.5 rounded-full ${step === 'chat' ? 'bg-violet-500' : 'bg-zinc-300 dark:bg-zinc-600'}`} />
-            <span className={`w-1.5 h-1.5 rounded-full ${step === 'styling' ? 'bg-violet-500' : 'bg-zinc-300 dark:bg-zinc-600'}`} />
-            <span className={`w-1.5 h-1.5 rounded-full ${step === 'preview' ? 'bg-violet-500' : 'bg-zinc-300 dark:bg-zinc-600'}`} />
+          <div className="flex items-center gap-1.5 text-xs text-zinc-500">
+            <span className={`w-1.5 h-1.5 rounded-full ${step === 'chat' ? 'bg-[#ff4d00]' : 'bg-zinc-700'}`} />
+            <span className={`w-1.5 h-1.5 rounded-full ${step === 'styling' ? 'bg-[#ff4d00]' : 'bg-zinc-700'}`} />
+            <span className={`w-1.5 h-1.5 rounded-full ${step === 'preview' ? 'bg-[#ff4d00]' : 'bg-zinc-700'}`} />
           </div>
-          <ThemeToggle />
         </div>
       </header>
 
@@ -121,35 +120,43 @@ export default function CreatePage() {
           <div className="flex-1 overflow-y-auto">
             <div className="max-w-3xl mx-auto px-6 py-8">
               <div className="mb-8">
-                <p className="text-xs font-semibold uppercase tracking-widest text-violet-500 mb-2">Design Brief</p>
-                <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">{brief.siteName}</h1>
-                <p className="text-zinc-500 dark:text-zinc-400 mt-2">{brief.description}</p>
+                <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-2">Design Brief</p>
+                <h1 className="text-2xl font-bold text-zinc-100">{brief.siteName}</h1>
+                <p className="text-zinc-400 mt-2">{brief.description}</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 mb-8 p-4 rounded-xl bg-zinc-100 dark:bg-zinc-800/50">
+              <div className="grid grid-cols-2 gap-4 mb-8 p-4 rounded-lg bg-zinc-900/50 border border-zinc-800">
                 <div>
-                  <p className="text-xs text-zinc-400 uppercase tracking-wider">Industry</p>
-                  <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{brief.industry}</p>
+                  <p className="text-xs text-zinc-500 uppercase tracking-wider">Industry</p>
+                  <p className="text-sm font-medium text-zinc-200">{brief.industry}</p>
                 </div>
                 <div>
-                  <p className="text-xs text-zinc-400 uppercase tracking-wider">Audience</p>
-                  <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{brief.targetAudience}</p>
+                  <p className="text-xs text-zinc-500 uppercase tracking-wider">Audience</p>
+                  <p className="text-sm font-medium text-zinc-200">{brief.targetAudience}</p>
                 </div>
                 {brief.brandPersonality?.length > 0 && (
                   <div className="col-span-2">
-                    <p className="text-xs text-zinc-400 uppercase tracking-wider">Personality</p>
+                    <p className="text-xs text-zinc-500 uppercase tracking-wider">Personality</p>
                     <div className="flex gap-1.5 mt-1 flex-wrap">
                       {brief.brandPersonality.map((t: string) => (
-                        <span key={t} className="px-2 py-0.5 text-xs rounded-full bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-400">
+                        <span key={t} className="px-2 py-0.5 text-xs rounded-full bg-zinc-800 text-zinc-400">
                           {t}
                         </span>
                       ))}
                     </div>
                   </div>
                 )}
+                <div>
+                  <p className="text-xs text-zinc-500 uppercase tracking-wider">User Accounts</p>
+                  <p className="text-sm font-medium text-zinc-200">{brief.needsAuth ? 'Yes' : 'No'}</p>
+                </div>
+                <div>
+                  <p className="text-xs text-zinc-500 uppercase tracking-wider">Blog</p>
+                  <p className="text-sm font-medium text-zinc-200">{brief.hasBlog ? 'Yes' : 'No'}</p>
+                </div>
               </div>
 
-              <p className="text-xs font-semibold uppercase tracking-widest text-violet-500 mb-4">Choose Your Style</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500 mb-4">Choose Your Style</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
                 {styleList.map((s) => (
                   <StyleCard
@@ -166,7 +173,7 @@ export default function CreatePage() {
 
               <button
                 onClick={handleGenerate}
-                className="w-full py-3.5 text-base font-semibold rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:opacity-90 transition-all"
+                className="w-full py-3.5 text-base font-semibold rounded-md bg-white text-black hover:bg-zinc-200 transition-all"
               >
                 Generate Site →
               </button>
@@ -176,17 +183,17 @@ export default function CreatePage() {
 
         {step === 'preview' && (
           <div className="flex-1 flex flex-col">
-            <div className="flex items-center gap-2 px-4 py-2 border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 flex-shrink-0">
+            <div className="flex items-center gap-2 px-4 py-2 border-b border-zinc-800 bg-zinc-900/50 flex-shrink-0">
               <button
                 onClick={() => setStep('styling')}
-                className="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+                className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
               >
                 ← Back to styles
               </button>
-              <span className="text-xs text-zinc-300 dark:text-zinc-600">|</span>
-              <span className="text-xs text-zinc-500">{brief?.siteName}</span>
+              <span className="text-xs text-zinc-700">|</span>
+              <span className="text-xs text-zinc-400">{brief?.siteName}</span>
               {brief && (
-                <span className="text-xs px-2 py-0.5 rounded-full bg-zinc-200 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-400 ml-auto">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 ml-auto">
                   {styleList.find(s => s.id === brief.style)?.name}
                 </span>
               )}

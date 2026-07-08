@@ -1,141 +1,227 @@
-import Link from 'next/link';
-import Header from '@/components/Header';
+'use client';
 
-const styles = [
-  { name: 'Cyber-Brutalism', desc: 'Neon glitch, raw grids, oversized', gradient: 'from-rose-600 to-cyan-400' },
-  { name: 'Scrollytelling', desc: 'Narrative scroll, parallax chapters', gradient: 'from-indigo-500 to-purple-400' },
-  { name: 'Kinetic Typography', desc: 'Animated text, morphing headlines', gradient: 'from-red-500 to-amber-400' },
-  { name: 'Glass + Aurora', desc: 'Frosted glass, gradient orbs, blur', gradient: 'from-violet-500 to-teal-400' },
-  { name: 'Neo-Brutalism', desc: 'Heavy shadows, bold borders', gradient: 'from-yellow-400 to-pink-500' },
+import { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+
+const styleShowcase = [
+  { name: 'Cyber-Brutalism', tag: 'Neon. Raw. Oversized.', color: '#ff0055', bg: '#0a0a0a' },
+  { name: 'Scrollytelling', tag: 'Narrative. Depth. Motion.', color: '#6c5ce7', bg: '#0d0d1a' },
+  { name: 'Kinetic Typography', tag: 'Letters that move.', color: '#ff6b6b', bg: '#000000' },
+  { name: 'Glass + Aurora', tag: 'Frosted. Glowing. Deep.', color: '#7c3aed', bg: '#050510' },
+  { name: 'Neo-Brutalism', tag: 'Shadows. Borders. Guts.', color: '#ffdd00', bg: '#ffffff' },
 ];
 
-export default function LandingPage() {
-  return (
-    <>
-      <Header />
-      <main>
-        <section className="min-h-screen flex flex-col items-center justify-center px-4 pt-24 pb-16 relative overflow-hidden">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-violet-500/10 via-transparent to-transparent dark:from-violet-500/5" />
+const styleMorph = [
+  'brutalist cyberpunk',
+  'narrative scrollytelling',
+  'kinetic typography',
+  'glass aurora dream',
+  'neo-brutalist bold',
+  'japanese minimal',
+  'editorial magazine',
+  'vaporwave retro',
+  'dark academia',
+  'brutalist glass',
+];
 
-          <div className="relative z-10 text-center max-w-4xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 text-xs font-medium rounded-full border border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 bg-white/50 dark:bg-zinc-900/50 backdrop-blur-sm">
-              <span className="w-1.5 h-1.5 rounded-full bg-violet-500 animate-pulse" />
-              AI Design Studio
+export default function Landing() {
+  const [email, setEmail] = useState('');
+  const [waitlistSubmitted, setWaitlistSubmitted] = useState(false);
+  const [morphIdx, setMorphIdx] = useState(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end start'] });
+  const heroOpacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMorphIdx(i => (i + 1) % styleMorph.length);
+    }, 2200);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div ref={containerRef} className="bg-[#0b0b0f] text-zinc-100 min-h-screen overflow-x-hidden">
+
+      {/* Navigation */}
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 h-16 backdrop-blur-lg bg-[#0b0b0f]/70 border-b border-zinc-800/50">
+        <div className="flex items-center gap-3">
+          <div className="w-7 h-7 rounded-md bg-[#ff4d00] flex items-center justify-center text-black font-bold text-xs">
+            K
+          </div>
+          <span className="font-semibold tracking-tight">Kyron</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <Link href="/create" className="text-sm text-zinc-400 hover:text-zinc-100 transition-colors">
+            Builder
+          </Link>
+          <a href="#waitlist" className="px-4 py-1.5 text-sm font-medium rounded-md bg-white text-black hover:bg-zinc-200 transition-colors">
+            Early Access
+          </a>
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <section className="min-h-screen flex items-center px-6 pt-24 pb-16 relative">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_0%,_#ff4d00_0%,_transparent_60%)] opacity-15" />
+        <div className="max-w-6xl mx-auto w-full relative z-10">
+
+          <motion.div style={{ opacity: heroOpacity }} className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 mb-8 text-xs font-medium rounded-full border border-zinc-700 text-zinc-400 bg-zinc-900/50">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#ff4d00]" />
+              AI Design Studio — now in early access
             </div>
 
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight leading-[0.95] mb-6">
-              <span className="bg-gradient-to-r from-violet-500 via-fuchsia-500 to-cyan-500 bg-clip-text text-transparent">
-                Describe it.
-              </span>
+            <h1 className="text-5xl sm:text-7xl md:text-8xl font-bold tracking-tight leading-[0.9] mb-6">
+              <span className="text-zinc-100">Describe your site.</span>
               <br />
-              <span className="text-zinc-900 dark:text-zinc-100">Kyron builds it.</span>
+              <span className="text-zinc-500">Kyron builds it.</span>
             </h1>
 
-            <p className="text-lg sm:text-xl text-zinc-500 dark:text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-              The first AI design studio that thinks before it builds. 
-              Kyron clarifies your vision, designs a unique aesthetic, 
-              generates a stunning site with 3D + motion, and deploys it live.
+            <p className="text-lg sm:text-xl text-zinc-500 max-w-xl mb-10 leading-relaxed">
+              Not another template. Not another page builder. Kyron thinks, designs, 
+              generates, and deploys — in minutes. With 3D, motion, and a style that is yours.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 items-start">
               <Link
                 href="/create"
-                className="px-8 py-3.5 text-base font-semibold rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:opacity-90 transition-all shadow-lg shadow-zinc-900/20 dark:shadow-white/10"
+                className="px-6 py-3 text-sm font-semibold rounded-md bg-white text-black hover:bg-zinc-200 transition-all"
               >
-                Start Building Free
+                Build Something →
               </Link>
               <a
-                href="#how-it-works"
-                className="px-8 py-3.5 text-base font-semibold rounded-xl border border-zinc-300 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all"
+                href="#how"
+                className="px-6 py-3 text-sm font-medium rounded-md border border-zinc-700 text-zinc-400 hover:text-zinc-100 hover:border-zinc-500 transition-all"
               >
-                How it Works
+                How it works
               </a>
             </div>
-          </div>
-        </section>
 
-        <section id="styles" className="py-20 px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <p className="text-xs font-semibold uppercase tracking-widest text-violet-500 mb-3">Design Styles</p>
-              <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-zinc-100">
-                Five bold aesthetics. Infinite blends.
-              </h2>
-              <p className="text-zinc-500 dark:text-zinc-400 mt-3">
-                Each style has its own typography, color theory, 3D strategy, and motion language.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {styles.map((s) => (
-                <div
-                  key={s.name}
-                  className="group relative p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all duration-300"
+            {/* Morphing style tag */}
+            <div className="mt-16">
+              <p className="text-xs uppercase tracking-[0.2em] text-zinc-600 mb-3">Choose a direction</p>
+              <AnimatePresence mode="wait">
+                <motion.span
+                  key={morphIdx}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3 }}
+                  className="inline-block text-2xl sm:text-3xl font-light text-zinc-400 italic"
                 >
-                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.gradient} mb-4 group-hover:scale-110 transition-transform duration-300`} />
-                  <h3 className="font-semibold text-zinc-900 dark:text-zinc-100 mb-1">{s.name}</h3>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">{s.desc}</p>
-                </div>
-              ))}
-              <div className="p-6 rounded-2xl border-2 border-dashed border-zinc-300 dark:border-zinc-700 flex items-center justify-center text-sm text-zinc-400 dark:text-zinc-500">
-                AI blends any two styles →
+                  {styleMorph[morphIdx]}
+                </motion.span>
+              </AnimatePresence>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* How it Works */}
+      <section id="how" className="px-6 py-32">
+        <div className="max-w-6xl mx-auto">
+          <p className="text-xs uppercase tracking-[0.2em] text-zinc-600 mb-4">Process</p>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-px bg-zinc-800/50">
+            {[
+              { step: '01', title: 'Clarify', desc: 'Kyron asks what you need. You answer. It asks again until it gets it right.' },
+              { step: '02', title: 'Design', desc: 'A complete design system is built — colors, type, 3D, motion. Human-level taste.' },
+              { step: '03', title: 'Generate', desc: 'Your site assembles with Three.js scenes, kinetic text, and scroll narratives.' },
+              { step: '04', title: 'Deploy', desc: 'One click. GitHub Pages. A live URL. No config, no hosting setup.' },
+            ].map((item) => (
+              <div key={item.step} className="bg-[#0b0b0f] p-8 group hover:bg-zinc-900/50 transition-colors">
+                <span className="text-3xl font-bold text-zinc-700 group-hover:text-[#ff4d00] transition-colors">{item.step}</span>
+                <h3 className="text-lg font-semibold mt-4 mb-2 text-zinc-200">{item.title}</h3>
+                <p className="text-sm text-zinc-500 leading-relaxed">{item.desc}</p>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Styles Showcase */}
+      <section className="px-6 py-32 bg-zinc-900/30">
+        <div className="max-w-6xl mx-auto">
+          <p className="text-xs uppercase tracking-[0.2em] text-zinc-600 mb-2">Styles</p>
+          <h2 className="text-3xl sm:text-4xl font-bold mb-12 text-zinc-200">
+            Five aesthetics. Infinite hybrids.
+          </h2>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {styleShowcase.map((s) => (
+              <div
+                key={s.name}
+                className="group p-6 rounded-lg border border-zinc-800 hover:border-zinc-600 transition-all"
+              >
+                <div
+                  className="w-full h-1 mb-5 rounded-full"
+                  style={{ backgroundColor: s.color }}
+                />
+                <h3 className="text-base font-semibold text-zinc-200">{s.name}</h3>
+                <p className="text-sm text-zinc-500 mt-1">{s.tag}</p>
+              </div>
+            ))}
+            <div className="p-6 rounded-lg border border-dashed border-zinc-700 flex items-center justify-center text-sm text-zinc-600">
+              Blend any two →
             </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section id="how-it-works" className="py-20 px-4 bg-zinc-50 dark:bg-zinc-900/50">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <p className="text-xs font-semibold uppercase tracking-widest text-violet-500 mb-3">How It Works</p>
-              <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-zinc-100">
-                Design-first AI. Not code-first.
-              </h2>
+      {/* Waitlist / Early Access */}
+      <section id="waitlist" className="px-6 py-32">
+        <div className="max-w-xl mx-auto text-center">
+          <p className="text-xs uppercase tracking-[0.2em] text-zinc-600 mb-4">Early Access</p>
+          <h2 className="text-3xl sm:text-4xl font-bold text-zinc-200 mb-4">
+            Kyron is free during beta.
+          </h2>
+          <p className="text-zinc-500 mb-8 leading-relaxed">
+            No credit card. No limits. Just describe your vision and get a live site.
+          </p>
+
+          {waitlistSubmitted ? (
+            <div className="p-4 rounded-lg bg-zinc-900 border border-zinc-700 text-zinc-300 text-sm">
+              You are on the list. We will send you a note when your spot is ready.
             </div>
-
-            <div className="space-y-8">
-              {[
-                { step: '01', title: 'Clarify', desc: 'Kyron asks smart questions to understand your brand, audience, and vision.' },
-                { step: '02', title: 'Design', desc: 'AI generates a complete design brief — colors, typography, 3D strategy, and style.' },
-                { step: '03', title: 'Generate', desc: 'Your site is assembled with 3D scenes, kinetic typography, and scroll animations.' },
-                { step: '04', title: 'Deploy', desc: 'One click deploys to GitHub Pages. You get a live URL instantly.' },
-                { step: '05', title: 'Evolve', desc: '"Make it more brutalist." Kyron regenerates the design while keeping your content.' },
-              ].map((item) => (
-                <div key={item.step} className="flex items-start gap-5 group">
-                  <div className="w-12 h-12 rounded-xl bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center text-sm font-bold text-zinc-500 dark:text-zinc-400 group-hover:bg-violet-500 group-hover:text-white transition-all duration-300 flex-shrink-0">
-                    {item.step}
-                  </div>
-                  <div className="pt-2.5">
-                    <h3 className="font-semibold text-lg text-zinc-900 dark:text-zinc-100">{item.title}</h3>
-                    <p className="text-zinc-500 dark:text-zinc-400 mt-1">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="py-20 px-4 text-center">
-          <div className="max-w-2xl mx-auto">
-            <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
-              Ready to build something stunning?
-            </h2>
-            <p className="text-zinc-500 dark:text-zinc-400 mb-8">
-              No account needed. No templates. Just your vision, brought to life.
-            </p>
-            <Link
-              href="/create"
-              className="inline-flex px-8 py-3.5 text-base font-semibold rounded-xl bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 hover:opacity-90 transition-all"
+          ) : (
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (email) setWaitlistSubmitted(true);
+              }}
+              className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
             >
-              Start Building Free
-            </Link>
-          </div>
-        </section>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your@email.com"
+                required
+                className="flex-1 px-4 py-3 text-sm rounded-md bg-zinc-900 border border-zinc-700 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-500 transition-colors"
+              />
+              <button
+                type="submit"
+                className="px-6 py-3 text-sm font-semibold rounded-md bg-white text-black hover:bg-zinc-200 transition-colors"
+              >
+                Join Waitlist
+              </button>
+            </form>
+          )}
+        </div>
+      </section>
 
-        <footer className="py-8 px-4 text-center text-sm text-zinc-400 dark:text-zinc-600 border-t border-zinc-200 dark:border-zinc-800">
-          Kyron — AI Design Studio. Built for Hackonomics 2027.
-        </footer>
-      </main>
-    </>
+      {/* Footer */}
+      <footer className="px-6 py-8 border-t border-zinc-800/50">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-zinc-600">
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded-[4px] bg-[#ff4d00] flex items-center justify-center text-black font-bold text-[8px]">
+              K
+            </div>
+            Kyron
+          </div>
+          <p>Made for Hackonomics 2027. Built with Groq.</p>
+        </div>
+      </footer>
+    </div>
   );
 }

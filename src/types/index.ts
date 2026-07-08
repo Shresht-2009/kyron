@@ -69,6 +69,8 @@ export interface DesignBrief {
   motion: MotionConfig;
   sections: SiteSection[];
   brandPersonality: string[];
+  needsAuth?: boolean;
+  hasBlog?: boolean;
 }
 
 export interface ClarificationMessage {

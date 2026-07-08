@@ -33,6 +33,8 @@ Cycle through these topics in order, but only ask about what you haven't covered
 4. Whether they want a secondary style blended in
 5. Whether they want 3D elements on the page
 6. What sections they need (hero, features, about, contact, etc.)
+7. Whether they need user accounts / authentication / login for their website
+8. Whether their site needs a blog or content management
 
 Keep asking ONE question at a time. Be conversational and excited about their project.
 
@@ -59,6 +61,8 @@ Output ONLY valid JSON with this exact schema:
   "secondaryStyle": "null or one of the styles above",
   "blendRatio": "number 0-100 (how much secondary style blends in, 0 if no secondary)",
   "brandPersonality": ["3-5 words describing the brand feel"],
+  "needsAuth": "boolean (whether they need user accounts/login)",
+  "hasBlog": "boolean (whether they need a blog section)",
   "sections": [
     {
       "id": "hero",
@@ -116,7 +120,7 @@ export async function clarifyPrompt(
   const groqMessages = [system, ...history];
 
   const response = await groqChat(groqMessages, {
-    model: 'mixtral-8x7b-32768',
+    model: 'llama-3.3-70b-versatile',
     temperature: 0.7,
     maxTokens: 1024,
   });
@@ -138,7 +142,7 @@ export async function generateDesignBrief(
   ];
 
   const response = await groqChat(groqMessages, {
-    model: 'mixtral-8x7b-32768',
+    model: 'llama-3.3-70b-versatile',
     temperature: 0.6,
     maxTokens: 4096,
     jsonMode: true,
@@ -146,6 +150,8 @@ export async function generateDesignBrief(
 
   const brief = JSON.parse(response) as DesignBrief;
 
+  brief.needsAuth = brief.needsAuth ?? false;
+  brief.hasBlog = brief.hasBlog ?? false;
   brief.colors = getColorsForStyle(brief.style, brief.secondaryStyle, brief.blendRatio);
   brief.typography = getTypographyForStyle(brief.style);
   brief.threeD = getThreeDConfig(brief.style);

@@ -28,7 +28,7 @@ export async function groqChat(
   }
 ): Promise<string> {
   const client = getClient();
-  const model = options?.model ?? 'mixtral-8x7b-32768';
+  const model = options?.model ?? 'llama-3.3-70b-versatile';
   const temperature = options?.temperature ?? 0.7;
   const maxTokens = options?.maxTokens ?? 8192;
 
@@ -55,7 +55,7 @@ export async function groqChatStream(
   }
 ): Promise<string> {
   const client = getClient();
-  const model = options?.model ?? 'mixtral-8x7b-32768';
+  const model = options?.model ?? 'llama-3.3-70b-versatile';
   const temperature = options?.temperature ?? 0.7;
   const maxTokens = options?.maxTokens ?? 8192;
 

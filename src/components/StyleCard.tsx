@@ -26,10 +26,10 @@ export default function StyleCard({ id, name, description, colors, selected, onC
   return (
     <motion.button
       onClick={onClick}
-      className={`relative text-left w-full p-4 rounded-xl border-2 transition-all duration-200 cursor-pointer ${
+      className={`relative text-left w-full p-4 rounded-lg border transition-all duration-200 cursor-pointer ${
         selected
-          ? 'border-zinc-900 dark:border-white bg-zinc-100 dark:bg-zinc-800'
-          : 'border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-zinc-400 dark:hover:border-zinc-500'
+          ? 'border-zinc-400 bg-zinc-800'
+          : 'border-zinc-800 bg-[#0b0b0f] hover:border-zinc-600'
       }`}
       whileHover={{ scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
@@ -39,13 +39,13 @@ export default function StyleCard({ id, name, description, colors, selected, onC
           {preview.icon}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-sm text-zinc-900 dark:text-zinc-100">{name}</h3>
-          <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 line-clamp-2">{description}</p>
+          <h3 className="font-semibold text-sm text-zinc-200">{name}</h3>
+          <p className="text-xs text-zinc-500 mt-0.5 line-clamp-2">{description}</p>
           <div className="flex gap-1 mt-2">
             {colors.slice(0, 4).map((c, i) => (
               <div
                 key={i}
-                className="w-3 h-3 rounded-full border border-zinc-300 dark:border-zinc-600"
+                className="w-3 h-3 rounded-full border border-zinc-600"
                 style={{ backgroundColor: c }}
               />
             ))}
