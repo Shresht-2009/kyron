@@ -10,6 +10,7 @@ interface PreviewFrameProps {
   onDeploy: () => void;
   deploying: boolean;
   deployResult: { url?: string; error?: string } | null;
+  previewUrl?: string;
 }
 
 function splitPath(p: string): string[] {
@@ -123,7 +124,7 @@ function detectLang(path: string): string {
   return 'text';
 }
 
-export default function PreviewFrame({ html, loading, files, onDeploy, deploying, deployResult }: PreviewFrameProps) {
+export default function PreviewFrame({ html, loading, files, onDeploy, deploying, deployResult, previewUrl }: PreviewFrameProps) {
   const [view, setView] = useState<'preview' | 'code'>('preview');
   const [selectedFile, setSelectedFile] = useState<string>('index.html');
 
@@ -175,6 +176,16 @@ export default function PreviewFrame({ html, loading, files, onDeploy, deploying
           >
             {deploying ? 'Deploying...' : 'Deploy →'}
           </button>
+          {previewUrl && (
+            <a
+              href={previewUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3 py-1 text-[11px] font-medium rounded border border-zinc-700 text-zinc-300 hover:bg-zinc-800 transition-all"
+            >
+              Open Live
+            </a>
+          )}
         </div>
       </div>
 

@@ -8,16 +8,16 @@ export function generateFullStackProject(brief: DesignBrief): ProjectFile[] {
 
   const css = generateCSS(brief);
   const threeJS = generateThreeJS(brief);
-  const motionJS = generateMotionJS(brief);
+  const siteJS = generateSiteJS(brief);
 
   files.push({
     path: 'index.html',
-    content: HTML(brief, css, threeJS, motionJS, useThree, useGSAP),
+    content: HTML(brief, css, threeJS, siteJS, useThree, useGSAP),
   });
 
   files.push({ path: 'styles/main.css', content: css });
 
-  const jsContent = [threeJS, motionJS].filter(Boolean).join('\n\n');
+  const jsContent = [threeJS, siteJS].filter(Boolean).join('\n\n');
   files.push({
     path: 'scripts/main.js',
     content: jsContent || '// Kyron — AI Design Studio\n',
@@ -41,7 +41,7 @@ export function generateFullStackProject(brief: DesignBrief): ProjectFile[] {
     });
     files.push({
       path: 'styles/auth.css',
-      content: 'input:focus{outline:none;border-color:var(--primary)!important;}\n',
+      content: 'input:focus{outline:none;border-color:var(--primary)!important;}\n.auth-form{display:flex;flex-direction:column;gap:1rem;}\n.auth-form input{width:100%;}\n',
     });
   }
 
@@ -62,8 +62,8 @@ export function generateFullStackProject(brief: DesignBrief): ProjectFile[] {
   return files;
 }
 
-function HTML(b: DesignBrief, css: string, three: string, motion: string, useThree: boolean, useGSAP: boolean): string {
-  const jsBundle = [three, motion].filter(Boolean).join('\n\n');
+function HTML(b: DesignBrief, css: string, three: string, sitejs: string, useThree: boolean, useGSAP: boolean): string {
+  const jsBundle = [three, sitejs].filter(Boolean).join('\n\n');
   return ko`<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -78,6 +78,7 @@ function HTML(b: DesignBrief, css: string, three: string, motion: string, useThr
   ${useGSAP && b.motion.kineticTypography ? '<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"><\/script>' : ''}
 </head>
 <body data-style="${b.style}">
+  ${navSection(b)}
   ${heroSection(b)}
   ${featuresSection(b)}
   ${aboutSection(b)}
@@ -88,21 +89,33 @@ function HTML(b: DesignBrief, css: string, three: string, motion: string, useThr
 </html>`;
 }
 
+function navSection(b: DesignBrief): string {
+  return `<nav style="position:fixed;top:0;left:0;right:0;z-index:9999;display:flex;align-items:center;justify-content:space-between;padding:0.75rem 2rem;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid color-mix(in srgb,var(--text) 10%,transparent);">
+  <a href="#" style="font-weight:700;color:var(--text);text-decoration:none;font-size:1.1rem;">${esc(b.siteName)}</a>
+  <div style="display:flex;gap:1.5rem;align-items:center;">
+    <a href="#features" style="font-size:0.875rem;color:var(--muted);text-decoration:none;">Features</a>
+    <a href="#about" style="font-size:0.875rem;color:var(--muted);text-decoration:none;">About</a>
+    <a href="#cta" style="font-size:0.875rem;color:var(--muted);text-decoration:none;">Contact</a>
+    ${b.needsAuth ? '<a href="login/" class="btn btn-primary" style="padding:0.4rem 1.25rem;font-size:0.8125rem;" id="kyron-auth-btn">Sign In</a>' : ''}
+  </div>
+</nav>`;
+}
+
 function heroSection(b: DesignBrief): string {
   const h = b.sections.find(s => s.type === 'hero')?.content || {};
   const hd = (h.headline as string) || b.tagline || 'Welcome';
   const sub = (h.subtitle as string) || b.description || '';
   const cta = (h.cta as string) || 'Get Started';
   const three = b.threeD.type !== 'none';
-  return `<section class="hero" id="hero">
+  return `<section class="hero" id="hero" style="padding-top:5rem;">
 ${three ? '<div id="three-container" style="position:absolute;inset:0;z-index:0;"></div>' : ''}
-<div class="hero-content container" style="position:relative;z-index:${three ? 2 : 1};">
+<div class="hero-content container" style="position:relative;z-index:${three ? 2 : 1};padding-top:4rem;padding-bottom:4rem;">
   <p class="section-label reveal">${esc(b.siteName)}</p>
   <h1 class="reveal">${esc(hd)}</h1>
   <p class="reveal reveal-delay-1">${esc(sub)}</p>
   <div class="reveal reveal-delay-2" style="margin-top:2rem;display:flex;gap:1rem;flex-wrap:wrap;">
-    <a href="#features" class="btn btn-primary">${esc(cta)}</a>
-    <a href="#about" class="btn btn-secondary">Learn More</a>
+    <a href="#cta" class="btn btn-primary">${esc(cta)}</a>
+    <a href="#features" class="btn btn-secondary">Explore</a>
   </div>
 </div>
 </section>`;
@@ -115,7 +128,7 @@ function featuresSection(b: DesignBrief): string {
   <p class="section-label reveal">Features</p>
   <h2 class="section-title reveal">What We Offer</h2>
   <div class="features-grid">
-${items.map((item, i) => `    <div class="feature-card reveal reveal-delay-${Math.min(i, 4)}">
+${items.map((item, i) => `    <div class="feature-card reveal reveal-delay-${Math.min(i, 4)}" tabindex="0" role="button">
       <h3>${esc(item.split(':')[0] || `Feature ${i + 1}`)}</h3>
       <p>${esc(item.split(':')[1] || item)}</p>
     </div>`).join('\n')}
@@ -143,19 +156,22 @@ function ctaSection(b: DesignBrief): string {
   const s = b.sections.find(s => s.type === 'cta')?.content || {};
   const hd = (s.headline as string) || 'Ready to Start?';
   const btn = (s.buttonText as string) || 'Get in Touch';
-  const em = b.siteName.toLowerCase().replace(/\s+/g, '');
   return `<section id="cta" class="cta-section">
   <div class="container reveal">
     <h2>${esc(hd)}</h2>
     <p style="margin-bottom:2rem;">Let's build something amazing together.</p>
-    <a href="mailto:hello@${esc(em)}.com" class="btn btn-primary">${esc(btn)}</a>
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;max-width:500px;margin:0 auto;">
+      <input type="email" placeholder="Your email" id="cta-email" style="flex:1;min-width:200px;padding:0.875rem 1rem;background:var(--surface);border:1px solid var(--muted);color:var(--text);border-radius:4px;font-family:inherit;font-size:1rem;">
+      <button class="btn btn-primary" id="cta-btn">${esc(btn)}</button>
+    </div>
+    <p id="cta-message" style="margin-top:1rem;font-size:0.875rem;color:var(--primary);display:none;"></p>
   </div>
 </section>`;
 }
 
 function footerSection(b: DesignBrief): string {
   const t = (b.sections.find(s => s.type === 'footer')?.content?.text as string) || `© ${new Date().getFullYear()} ${b.siteName}`;
-  return `<footer><div class="container"><p>${esc(t)}</p></div></footer>`;
+  return `<footer><div class="container" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;"><p>${esc(t)}</p></div></footer>`;
 }
 
 function blogHTML(b: DesignBrief): string {
@@ -164,7 +180,7 @@ function blogHTML(b: DesignBrief): string {
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Blog — ${esc(b.siteName)}</title>
-  <link rel="stylesheet" href="../styles/main.css">
+  <style>${generateCSS(b)}</style>
   <link rel="stylesheet" href="../styles/blog.css">
 </head>
 <body data-style="${b.style}">
@@ -174,8 +190,21 @@ function blogHTML(b: DesignBrief): string {
   </nav>
   <section class="container" style="padding-top:4rem;">
     <h1>Blog</h1>
-    <p style="color:var(--muted);margin-top:0.5rem;">Coming soon.</p>
+    <p style="color:var(--muted);margin-top:0.5rem;" id="blog-posts">Loading...</p>
   </section>
+  <script>
+(function(){
+var posts=JSON.parse(localStorage.getItem('kyron_blog_${esc(b.siteName.replace(/\s/g,''))}')||'[]');
+var el=document.getElementById('blog-posts');
+if(!posts.length){el.textContent='No posts yet. Check back soon.';return;}
+el.innerHTML='';
+posts.forEach(function(p){
+var d=document.createElement('div');d.className='blog-post';
+d.innerHTML='<h3 style="margin-bottom:0.5rem;">'+p.title+'</h3><p style="font-size:0.875rem;color:var(--muted);">'+p.content+'</p>';
+el.appendChild(d);
+});
+})();
+<\/script>
 </body>
 </html>`;
 }
@@ -186,21 +215,56 @@ function loginHTML(b: DesignBrief): string {
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
   <title>Login — ${esc(b.siteName)}</title>
-  <link rel="stylesheet" href="../styles/main.css">
+  <style>${generateCSS(b)}</style>
   <link rel="stylesheet" href="../styles/auth.css">
 </head>
 <body data-style="${b.style}">
   <nav style="padding:1rem 2rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--muted);">
     <a href="../" style="font-weight:600;color:var(--text);text-decoration:none;">${esc(b.siteName)}</a>
   </nav>
-  <section class="container" style="padding-top:4rem;max-width:400px;margin:0 auto;">
-    <h1 style="text-align:center;font-size:2rem;">Sign In</h1>
-    <div style="margin-top:2rem;display:flex;flex-direction:column;gap:1rem;">
-      <input type="email" placeholder="Email" style="padding:0.75rem 1rem;background:var(--surface);border:1px solid var(--muted);color:var(--text);border-radius:4px;font-family:inherit;">
-      <input type="password" placeholder="Password" style="padding:0.75rem 1rem;background:var(--surface);border:1px solid var(--muted);color:var(--text);border-radius:4px;font-family:inherit;">
-      <button class="btn btn-primary" style="justify-content:center;">Sign In</button>
-    </div>
+  <section class="container" style="padding-top:6rem;max-width:420px;margin:0 auto;">
+    <h1 class="auth-title" style="text-align:center;font-size:2rem;">Sign In</h1>
+    <p class="auth-toggle" style="text-align:center;margin-top:0.5rem;font-size:0.875rem;color:var(--muted);">Don't have an account? <a href="#" style="color:var(--primary);text-decoration:none;font-weight:600;">Sign Up</a></p>
+    <form class="auth-form" style="margin-top:2rem;display:flex;flex-direction:column;gap:1rem;">
+      <input type="email" placeholder="Email" required style="padding:0.75rem 1rem;background:var(--surface);border:1px solid var(--muted);color:var(--text);border-radius:4px;font-family:inherit;font-size:1rem;">
+      <input type="password" placeholder="Password" required style="padding:0.75rem 1rem;background:var(--surface);border:1px solid var(--muted);color:var(--text);border-radius:4px;font-family:inherit;font-size:1rem;">
+      <button type="submit" class="btn btn-primary" style="justify-content:center;font-size:1rem;">Sign In</button>
+    </form>
+    <p id="auth-error" style="text-align:center;margin-top:1rem;font-size:0.875rem;color:#ff4444;display:none;"></p>
   </section>
+  <script>
+(function(){
+var form=document.querySelector('.auth-form');
+var title=document.querySelector('.auth-title');
+var toggle=document.querySelector('.auth-toggle');
+var err=document.getElementById('auth-error');
+var submitBtn=form.querySelector('button[type="submit"]');
+var mode='login';
+toggle.addEventListener('click',function(e){
+if(e.target.tagName!=='A')return;
+e.preventDefault();
+mode=mode==='login'?'signup':'login';
+title.textContent=mode==='login'?'Sign In':'Create Account';
+submitBtn.textContent=mode==='login'?'Sign In':'Create Account';
+toggle.innerHTML=mode==='login'?'Don\'t have an account? <a href="#" style="color:var(--primary);text-decoration:none;font-weight:600;">Sign Up</a>':'Already have an account? <a href="#" style="color:var(--primary);text-decoration:none;font-weight:600;">Sign In</a>';
+err.style.display='none';
+});
+form.addEventListener('submit',function(e){
+e.preventDefault();err.style.display='none';
+var email=form.querySelector('input[type="email"]').value.trim();
+var pass=form.querySelector('input[type="password"]').value.trim();
+if(!email||!pass){err.textContent='Please fill in all fields.';err.style.display='block';return;}
+var users=JSON.parse(localStorage.getItem('kyron_users')||'{}');
+if(mode==='login'){
+if(users[email]&&users[email]===pass){localStorage.setItem('kyron_session',email);window.location.href='../';}
+else{err.textContent='Invalid email or password.';err.style.display='block';}
+}else{
+if(users[email]){err.textContent='An account with this email already exists.';err.style.display='block';return;}
+users[email]=pass;localStorage.setItem('kyron_users',JSON.stringify(users));localStorage.setItem('kyron_session',email);window.location.href='../';
+}
+});
+})();
+<\/script>
 </body>
 </html>`;
 }
@@ -251,19 +315,85 @@ ren.setSize(w,h);
 }catch(e){console.error('3D:',e)}`;
 }
 
-function generateMotionJS(b: DesignBrief): string {
-  if (!b.motion.scrollReveal) return '';
+function generateSiteJS(b: DesignBrief): string {
+  const auth = b.needsAuth ? `
+var kyronBtn=document.getElementById('kyron-auth-btn');
+if(kyronBtn){
+var ses=localStorage.getItem('kyron_session');
+if(ses){
+kyronBtn.textContent='Dashboard';
+kyronBtn.href='#';
+kyronBtn.onclick=function(e){
+e.preventDefault();
+var m=document.createElement('div');
+m.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px);';
+m.innerHTML='<div style="background:var(--surface);border:1px solid var(--muted);border-radius:16px;padding:2.5rem;max-width:400px;width:90%;text-align:center;"><h2 style="margin-bottom:0.5rem;">Welcome back</h2><p style="color:var(--muted);margin-bottom:1.5rem;">'+ses+'</p><button onclick="localStorage.removeItem(\'kyron_session\');location.reload();" style="padding:0.75rem 2rem;background:var(--primary);color:#fff;border:none;border-radius:8px;font-size:1rem;cursor:pointer;">Sign Out</button><br><button onclick="this.closest(\'div\').closest(\'div\').remove();" style="margin-top:1rem;padding:0.5rem 1.5rem;background:transparent;color:var(--muted);border:1px solid var(--muted);border-radius:8px;font-size:0.875rem;cursor:pointer;">Close</button></div>';
+document.body.appendChild(m);
+};
+}
+}
+` : '';
+
   return `
-document.addEventListener('DOMContentLoaded',function(){
+(function(){
+// Smooth scroll
+var links=document.querySelectorAll('a[href^="#"]');
+for(var i=0;i<links.length;i++){
+links[i].addEventListener('click',function(e){
+e.preventDefault();
+var t=document.querySelector(this.getAttribute('href'));
+if(t)t.scrollIntoView({behavior:'smooth'});
+});
+}
+})();
+
+(function(){
+// Scroll reveal
 var els=document.querySelectorAll('.reveal');
-if(!els.length)return;
+if(els.length){
 var obs=new IntersectionObserver(function(entries){
 entries.forEach(function(e){
 if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target);}
 });
 },{threshold:0.15});
 els.forEach(function(el){obs.observe(el);});
-});`;
+}
+})();
+
+(function(){
+// CTA form handler
+var ctaBtn=document.getElementById('cta-btn');
+var ctaEmail=document.getElementById('cta-email');
+var ctaMsg=document.getElementById('cta-message');
+if(ctaBtn&&ctaEmail){
+ctaBtn.addEventListener('click',function(){
+var email=ctaEmail.value.trim();
+if(!email){ctaMsg.textContent='Please enter your email.';ctaMsg.style.display='block';return;}
+var leads=JSON.parse(localStorage.getItem('kyron_leads')||'[]');
+leads.push({email:email,site:'${esc(b.siteName)}',date:new Date().toISOString()});
+localStorage.setItem('kyron_leads',JSON.stringify(leads));
+ctaMsg.textContent='Thanks! We\\'ll be in touch.';
+ctaMsg.style.display='block';
+ctaEmail.value='';
+});
+}
+})();
+
+(function(){
+// Feature card interaction
+var cards=document.querySelectorAll('.feature-card');
+for(var i=0;i<cards.length;i++){
+cards[i].addEventListener('click',function(){
+this.classList.toggle('expanded');
+var p=this.querySelector('p');
+if(p&&this.classList.contains('expanded')){
+var more=this.getAttribute('data-more');
+if(more){p.textContent=more;}
+}
+});
+}
+})();
+${auth}`;
 }
 
 function esc(s: string): string {

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateFullStackProject } from '@/lib/codegen/fullstack';
+import { storeSite, generateId } from '@/lib/site-store';
 import type { DesignBrief } from '@/types';
 
 export async function POST(req: NextRequest) {
@@ -27,10 +28,16 @@ export async function POST(req: NextRequest) {
 
     if (!mainHtml) mainHtml = files[0]?.content || '';
 
+    // Store for local preview
+    const siteId = generateId();
+    storeSite(siteId, brief.siteName, filesRecord);
+
     return NextResponse.json({
       html: mainHtml,
       files: filesRecord,
       structure: files.map(f => f.path).join('\n'),
+      siteId,
+      previewUrl: `/api/preview/${siteId}/`,
       success: true,
     });
   } catch (error: any) {
