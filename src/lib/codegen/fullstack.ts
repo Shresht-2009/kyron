@@ -63,6 +63,7 @@ export function generateFullStackProject(brief: DesignBrief): ProjectFile[] {
 }
 
 function HTML(b: DesignBrief, css: string, three: string, motion: string, useThree: boolean, useGSAP: boolean): string {
+  const jsBundle = [three, motion].filter(Boolean).join('\n\n');
   return ko`<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -71,7 +72,7 @@ function HTML(b: DesignBrief, css: string, three: string, motion: string, useThr
   <title>${esc(b.siteName)}</title>
   <meta name="description" content="${esc(b.description)}">
   <meta name="theme-color" content="${b.colors.background}">
-  <link rel="stylesheet" href="styles/main.css">
+  <style>${css}</style>
   ${useThree ? '<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>' : ''}
   ${useGSAP ? '<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"><\/script>' : ''}
   ${useGSAP && b.motion.kineticTypography ? '<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"><\/script>' : ''}
@@ -82,7 +83,7 @@ function HTML(b: DesignBrief, css: string, three: string, motion: string, useThr
   ${aboutSection(b)}
   ${ctaSection(b)}
   ${footerSection(b)}
-  <script src="scripts/main.js"><\/script>
+  <script>${jsBundle}<\/script>
 </body>
 </html>`;
 }
