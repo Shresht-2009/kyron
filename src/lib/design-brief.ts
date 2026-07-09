@@ -14,20 +14,16 @@ export async function clarifyPrompt(
   questionCount: number
 ): Promise<string> {
   if (questionCount === 0) {
-    return "What's the name of your project or business, and what do you do in one sentence?";
+    return "What's your project or business called, and what do you do? (Even a one-word answer works — I'll build the rest.)";
   }
   if (questionCount >= 3) return 'DESIGN_BRIEF_READY';
 
   const last = messages.filter(m => m.role === 'user').pop()?.content || '';
 
   const topics = [
-    'what industry or field are you in?',
-    'who is your target audience?',
-    `what style do you want? (pick 1-2 from: cyber-brutalism, scrollytelling, kinetic-typography, glass-aurora, neo-brutalism)`,
-    'do you want 3D elements on the page?',
-    'what sections do you need? (hero, features, about, contact, etc.)',
-    'do users need to create accounts or log in?',
-    'does your site need a blog?',
+    'who is this for? (target audience, e.g. "small businesses", "gamers", "creatives")',
+    `what vibe do you want? (pick 1-2: cyber-brutalism, scrollytelling, kinetic-typography, glass-aurora, neo-brutalism — or describe the feeling)`,
+    'what are the 2-3 most important things your website needs to communicate?',
   ];
 
   const prompt = `You are Kyron, an AI design director. The user says: "${last}"
@@ -35,7 +31,7 @@ export async function clarifyPrompt(
 Pick ONE unanswered question from this list and ask it:
 ${topics.map((t, i) => `${i + 1}. ${t}`).join('\n')}
 
-Ask only that one question. No intro, no explanation. Just the question.`;
+Ask only that one question. Keep it conversational. No intro, no explanation.`;
 
   const res = await groqChat([{ role: 'system', content: prompt }], {
     model: 'llama-3.3-70b-versatile', temperature: 0.5, maxTokens: 256,
@@ -43,31 +39,43 @@ Ask only that one question. No intro, no explanation. Just the question.`;
   return res.trim();
 }
 
-const GENERATE_PROMPT = `You are Kyron's design engine. Based on the conversation, generate a brief in JSON.
+const GENERATE_PROMPT = `You are Kyron's senior design engine. Your job: generate a COMPLETE, RICH, SPECIFIC design brief JSON from the user's input — even if they gave almost nothing.
 
-Schema:
+RULES:
+1. If the user gave minimal info (just a name or one sentence), INVENT EVERYTHING. Make reasonable, creative assumptions based on the name/industry.
+2. Every field must be filled with CONCRETE, SPECIFIC content — not generic or vague text.
+3. The headline and tagline must be punchy and brand-specific (e.g. "Brewed Different" for a coffee brand, not "Welcome to Our Site").
+4. Features must describe 3-4 REAL-SOUNDING capabilities with benefits, not generic bullet points (e.g. "AI-powered roast profiling ensures every batch tastes exactly as intended").
+5. The about paragraph must tell a short, compelling brand story.
+6. CTA must be action-oriented and specific to the brand.
+7. Pick the best style from: cyber-brutalism, scrollytelling, kinetic-typography, glass-aurora, neo-brutalism. Match the brand personality.
+8. Choose secondaryStyles (0-2) and blendRatio thoughtfully to create interesting style blends.
+9. brandPersonality must be 3-5 specific adjectives that fit the brand.
+10. needsAuth and hasBlog: set to true only if it makes sense for the brand type.
+
+OUTPUT SCHEMA (fill ALL fields — no empty values):
 {
   "siteName": "string",
-  "tagline": "string",
-  "description": "string (2 sentences)",
+  "tagline": "short powerful tagline",
+  "description": "2 specific sentences about what they do",
   "industry": "string",
   "targetAudience": "string",
-  "style": "one of: cyber-brutalism, scrollytelling, kinetic-typography, glass-aurora, neo-brutalism",
-  "secondaryStyles": ["array of 0-2 additional style names"],
+  "style": "one of the 5 styles",
+  "secondaryStyles": ["array of 0-2 other styles"],
   "blendRatio": "number 0-100",
-  "brandPersonality": ["3-5 words"],
+  "brandPersonality": ["3-5 specific adjectives"],
   "needsAuth": "boolean",
   "hasBlog": "boolean",
   "sections": [
-    {"id":"hero","type":"hero","content":{"headline":"string","subtitle":"string","cta":"string"}},
-    {"id":"features","type":"features","content":{"items":["3-4 feature descriptions"]}},
-    {"id":"about","type":"about","content":{"paragraph":"string"}},
-    {"id":"cta","type":"cta","content":{"headline":"string","buttonText":"string"}},
-    {"id":"footer","type":"footer","content":{"text":"string"}}
+    {"id":"hero","type":"hero","content":{"headline":"brand-specific headline","subtitle":"supporting sentence","cta":"action button text"}},
+    {"id":"features","type":"features","content":{"items":["specific feature 1 with benefit","specific feature 2 with benefit","specific feature 3 with benefit","specific feature 4 with benefit"]}},
+    {"id":"about","type":"about","content":{"paragraph":"compelling brand story (3-4 sentences)"}},
+    {"id":"cta","type":"cta","content":{"headline":"persuasive headline","buttonText":"action text"}},
+    {"id":"footer","type":"footer","content":{"text":"copyright and brand line"}}
   ]
 }
 
-Make content specific to the user. Choose appropriate style.`;
+REMEMBER: Even with 1 word of input, output a FULL brief. Invent creatively. Never return empty or generic placeholders.`;
 
 export async function generateDesignBrief(
   history: { role: string; content: string }[]
