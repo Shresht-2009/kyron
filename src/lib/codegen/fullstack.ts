@@ -208,6 +208,7 @@ function generateThreeJS(b: DesignBrief): string {
   if (b.threeD.type === 'none') return '';
   const hex = parseInt(b.threeD.color.replace('#', ''), 16);
   return `
+try{
 (function(){
 var scene=new THREE.Scene();
 var cam=new THREE.PerspectiveCamera(75,window.innerWidth/window.innerHeight,0.1,1000);
@@ -245,7 +246,8 @@ var w=ct.clientWidth,h=ct.clientHeight;
 cam.aspect=w/h;cam.updateProjectionMatrix();
 ren.setSize(w,h);
 });
-})();`;
+})();
+}catch(e){console.error('3D:',e)}`;
 }
 
 function generateMotionJS(b: DesignBrief): string {

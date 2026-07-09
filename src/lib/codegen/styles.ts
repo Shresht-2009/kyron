@@ -27,9 +27,7 @@ section{padding:clamp(4rem,10vh,8rem) 0;position:relative}
 .btn-secondary:hover{background:var(--text);color:var(--bg)}
 .section-label{display:inline-block;font-size:0.75rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--primary);margin-bottom:1rem}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2rem}
-.reveal{opacity:0;transform:translateY(30px);transition:opacity 0.8s ease,transform 0.8s ease}
-.reveal.visible{opacity:1;transform:translateY(0)}
-.reveal-delay-1{transition-delay:0.1s}.reveal-delay-2{transition-delay:0.2s}.reveal-delay-3{transition-delay:0.3s}.reveal-delay-4{transition-delay:0.4s}`;
+`;
 }
 
 function generateSpecific(style: KyronStyle, colors: DesignBrief['colors'], brief: DesignBrief): string {
